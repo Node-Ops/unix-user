@@ -16,15 +16,23 @@ user.exists = function(username, done) {
 };
 
 // Creates a user
-user.create = function(username, pass, done) {
+user.create = function(username, pass, opts, done) {
+	// Process optional args
 	if (typeof pass === 'function') {
 		done = pass;
 		pass = null;
+		opts = [];
+	} else if (typeof opts === 'function') {
+		done = opts;
+		opts = [];
 	}
+
+	// Push on username
+	opts.push(username);
 
 	// Spawn useradd command
 	// ex: $ useradd <user>
-	return child.spawn('useradd', [username])
+	return child.spawn('useradd', opts)
 		.on('close', function(code) {
 			if (code) {
 				return done('Failed to create user. Exit code: ' + code);
